@@ -4,20 +4,19 @@ import geopandas as gpd
 
 class PowerDemandIndicator(BaseIndicator):
     def extract(self, gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-        """
-        Estimate relative power demand based on land cover codes.
-        """
         def classify_demand(code):
-            if str(code).startswith("1"):  # urban
-                return "High"
-            elif str(code).startswith("2"):  # industrial/infrastructure
+            code = str(code).lower()
+            if "nau" in code:
                 return "Very High"
-            elif str(code).startswith("3"):  # agricultural
+            elif "hua" in code or "had" in code:
+                return "High"
+            elif "cg" in code or "mdun" in code:
                 return "Medium"
-            elif str(code).startswith("4"):  # forest/natural
+            elif "co" in code or "mr" in code or "chr" in code:
                 return "Low"
-            else:
-                return "Unknown"
+            elif "wl" in code or "wb" in code:
+                return "Minimal"
+            return "Unknown"
 
         gdf["power_demand_level"] = gdf["CODI_COBER"].apply(classify_demand)
         return gdf

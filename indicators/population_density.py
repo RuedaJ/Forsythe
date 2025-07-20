@@ -4,20 +4,17 @@ import geopandas as gpd
 
 class PopulationDensityIndicator(BaseIndicator):
     def extract(self, gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-        """
-        Estimate population density category from land cover codes.
-        """
         def estimate_density(code):
-            if str(code).startswith("1"):  # residential urban
+            code = str(code).lower()
+            if "nau" in code:
                 return "High"
-            elif str(code).startswith("2"):  # industrial/infrastructure
+            elif "hua" in code or "had" in code:
                 return "Medium"
-            elif str(code).startswith("3"):  # rural/agricultural
+            elif "mr" in code or "co" in code or "wl" in code:
                 return "Low"
-            elif str(code).startswith("4"):  # forest
+            elif "wb" in code or "chr" in code:
                 return "Very Low"
-            else:
-                return "Unknown"
+            return "Unknown"
 
         gdf["population_density_est"] = gdf["CODI_COBER"].apply(estimate_density)
         return gdf
