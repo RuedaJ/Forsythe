@@ -4,8 +4,11 @@ import geopandas as gpd
 
 class LandCoverIndicator(BaseIndicator):
     def extract(self, gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-        # Dummy logic: Classify urban vs non-urban from `CODI_COBER` code
-        gdf["landcover_type"] = gdf["CODI_COBER"].apply(
-            lambda x: "Urban" if str(x).startswith("1") else "Non-Urban"
-        )
+        def classify_landcover(code):
+            code = str(code).lower()
+            if "nau" in code or "hua" in code or "had" in code:
+                return "Urban"
+            return "Non-Urban"
+
+        gdf["landcover_type"] = gdf["CODI_COBER"].apply(classify_landcover)
         return gdf
